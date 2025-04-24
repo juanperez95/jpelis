@@ -1,12 +1,14 @@
 <template >
     <div>
-        <form @submit.prevent class="border border-gray-300 rounded-md shadow-sm p-4 bg-gradient-to-t from-purple-950 to-black w-96">
+        <form @submit.prevent class="shadow-sm p-4 bg-gradient-to-t from-purple-950 to-black w-96">
+            <!-- Section para la interfaz general del formulario -->
             <section class="grid grid-cols-1 p-5 w-full justify-items-center" v-show="!clickRegistro">
                 <article>
                     <h6 class="text-white text-center">¡INICIA SESIÓN O CREA UNA CUENTA!</h6>
                     <article class="justify-items-center">
-                        <Boton texto="Registrate ahora" @funcion_btn="() => {clickRegistro = true}" class="mt-3"/>
-                        <Boton texto="Iniciar sesión" @funcion_btn="console.log('sesión')" class="mt-3"/>
+                        <!-- Al abrir la interfaz de registro se cierra la de login llegado el caso que el usuario realizo un click -->
+                        <Boton texto="Registrate ahora" @funcion_btn="() => {clickRegistro = true; clickLogin = false}" class="mt-3"/>
+                        <Boton texto="Iniciar sesión" @funcion_btn="()=>{clickLogin = true}" class="mt-3"/>
                     </article>
                 </article>
                 <article class="mt-12">
@@ -16,6 +18,7 @@
                     </article>
                 </article>
             </section>
+            <!-- Section para el registro -->
             <section class="grid grid-cols-1 p-5 w-full justify-items-center" v-show="clickRegistro">
                 <form @submit.prevent>
                     <h6 class="text-white text-center">¡REGISTRATE AHORA!</h6>
@@ -39,6 +42,21 @@
                     </article>  
                 </form>
             </section>
+            <!-- Section para el inicio de sesión -->
+            <section class="grid grid-cols-1 p-5 w-full justify-items-center" v-show="clickLogin">
+                <form @submit.prevent>
+                    <h6 class="text-white text-center">¡INICIA SESIÓN!</h6>
+                    <!-- Solo pedir el documento del usuario y despues la clave para el envio de otro formulario -->
+                    <article>
+                        <Inputs tipo="number" place="Documento" :modelo="loginForm.documento" @update:modelo="loginForm.documento = $event"/>
+                        <Inputs tipo="password" place="Contraseña" :modelo="loginForm.clave" @update:modelo="loginForm.clave = $event"/>
+                        <article>
+                            <Boton texto="Iniciar sesión" @funcion_btn="iniciarSesion" class="mt-3"/>
+                            <Boton texto="Cancelar" @funcion_btn="()=>{clickLogin = false}" class="mt-3"/>
+                        </article>
+                    </article>
+                </form>
+            </section>
         </form>
     </div>
 </template>
@@ -47,12 +65,18 @@
 <script setup>
 import Boton from './Boton.vue';
 import Inputs from './Inputs.vue';
-import {reactive,ref,computed} from 'vue';
+import {ref,computed} from 'vue';
+import { useForm } from '@inertiajs/vue3';
 
 // Crear un metodo para cuando el usuario quiera realizar el registro
 let clickRegistro = ref(false);
+// Habilitar la interfaz para el inicio de sesión
+let clickLogin = ref(false);
 
-const registroForm = reactive({
+
+// --------------------------------------------- formulario registro -----------------------------------------------
+ 
+const registroForm = useForm({
     documento:undefined,
     nombre:null,
     apellido:null,
@@ -70,11 +94,31 @@ const validarDatos = computed(() => {
 // Metodo para enviar los datos del formulario al backend
 const enviarDatos = () => {
     if(validarDatos){
+        registroForm.post('/registro',{
+            onSuccess:()=>{
+                clickRegistro = false;
+            }
+        });
         console.log(registroForm);
+        
     }else{
         console.log('Datos no validados');
     }
 }
+
+// --------------------------------------------- formulario inicio de sesión -----------------------------------------------
+const loginForm = useForm({
+    documento:undefined,
+    clave:null,
+});
+
+const iniciarSesion = () => {
+    console.log(loginForm);  
+}
+
+
+
+
 </script>
 
 

@@ -1,14 +1,14 @@
 <template>
     <div>
-        <h1>Home --> </h1>
-        <FormLogin />
+        <section class="flex flex-row justify-center items-center">
+            <ReservaSilla />
+        </section>
     </div>
 </template>
 
 <script setup>
 import { ref } from 'vue'
-import FormLogin from '../../Components/FormLogin.vue';
-
+import ReservaSilla from '../../Components/ReservaSilla.vue';
 
 </script>
 
